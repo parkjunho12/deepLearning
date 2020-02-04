@@ -1,0 +1,32 @@
+def predict_pos_neg(review):
+    token = tokenize(review)
+    tf = term_frequency(token)
+    data = np.expand_dims(np.asarray(tf).astype('float32'), axis=0)
+    data_class = str(model.predict_classes(data))
+    data_score = float(model.predict(data))
+    print(model.predict(data))
+    if data_class == "1":
+        print("데이터는 " + str(data_score) + "확률료 C언어 입니다." )
+    elif data_class == "2":
+        print("데이터는 " + str(data_score) + "확률료 C++언어 입니다.")
+    elif data_class == "3":
+        print("데이터는 " + str(data_score) + "확률료 java언어 입니다." )
+    elif data_class == "4":
+        print("데이터는 " + str(data_score) + "확률료 javaScript언어 입니다." )   
+    else:
+        print("데이터는 " + str(data_score) + "확률료 python언어 입니다." )     
+
+def modeling(x_train, y_train):
+    model = models.Sequential()
+    model.add(layers.Dense(512, input_shape=(6053, ), activation='relu'))
+    model.add(layers.Dense(128, activation='relu'))
+    model.add(layers.Dense(32, activation='relu'))
+    model.add(layers.Dense(10, activation='softmax'))
+
+    model.compile(optimizer=optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-8),
+                  loss=losses.sparse_categorical_crossentropy,
+                  metrics=[metrics.sparse_categorical_accuracy])
+    tb_hist = keras.callbacks.TensorBoard(log_dir='./graphs', histogram_freq=0, write_graph=True,
+                                          write_images=True, profile_batch = 100000000)
+    model.fit(x_train, y_train, epochs=25, batch_size=512, callbacks=[tb_hist])
+    return model
